@@ -59,6 +59,17 @@ class Watch : public std::enable_shared_from_this<Watch>, private ci::Noncopyabl
 	bool isEnabled() const			{ return mEnabled; }
 
   protected:
+
+	  enum Type {
+		  SINGLE,
+		  MULTI,
+		  REGEX
+	  };
+
+	ci::fs::path mPath;
+	vector<ci::fs::path> mPaths;
+	string mRegex;
+
 	bool mDiscarded = false;
 	bool mEnabled = true;
 	bool mNeedsCallback = false;

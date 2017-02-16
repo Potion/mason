@@ -42,6 +42,8 @@ class Watch;
 class MA_API FileWatcher {
   public:
 	~FileWatcher();
+
+	static FileWatchRef create();
 	
 	//! Returns the global instance of FileWatcher
 	static FileWatcher* instance();
@@ -51,15 +53,22 @@ class MA_API FileWatcher {
 	//! Returns whether file watching is enabled or disabled.
 	static bool	isWatchingEnabled();
 
+	// TODO: call it ci::FileEvent?
+	struct Event {
+		const fs::path& getPath() const;
+	};
+
 	//! Loads a single file at \a filePath and adds it to the watch list. Immediately calls \a callback with the resolved path, and also calls it whenever the file has been updated.
-	static ci::signals::Connection load( const ci::fs::path &filePath, const std::function<void ( const ci::fs::path& )> &callback );
+	ci::signals::Connection load( const ci::fs::path &filePath, const std::function<void ( const ci::fs::path& )> &callback );
 	//! Loads the files in \a filePaths and adds them to the watch list. Immediately calls \a callback with the resolved paths, and also calls it whenever one of the files has been updated.
-	static ci::signals::Connection load( const std::vector<ci::fs::path> &filePaths, const std::function<void ( const std::vector<ci::fs::path> & )> &callback );
+	ci::signals::Connection load( const std::vector<ci::fs::path> &filePaths, const std::function<void ( const ci::fs::path & )> &callback );
 	//! Adds a single file at \a filePath to the watch list. Does not immediately call \a callback, but calls it whenever the file has been updated.
-	static ci::signals::Connection watch( const ci::fs::path &filePath, const std::function<void ( const ci::fs::path& )> &callback );
+	ci::signals::Connection watch( const ci::fs::path &filePath, const std::function<void ( const FileMods& )> &callback );
 	//! Adds the files in \a filePaths to the watch list. Does not immediately call \a callback, but calls it whenever one of the files has been updated.
-	static ci::signals::Connection watch( const std::vector<ci::fs::path> &filePaths, const std::function<void ( const std::vector<ci::fs::path> & )> &callback );
+	ci::signals::Connection watch( const std::vector<ci::fs::path> &filePaths, const std::function<void ( const std::vector<ci::fs::path> & )> &callback );
 	
+	// TODO: consider naming these unwatchAll / enableAll()
+
 	//! Removes any watches for \a filePath
 	void unwatch( const ci::fs::path &filePath );
 	//! Removes any watches for \a filePaths
@@ -83,11 +92,17 @@ class MA_API FileWatcher {
 	void	update();
 
 	std::list<std::unique_ptr<Watch>>	mWatchList;
+
+	class Impl;
+	std::unique_ptr<Impl>	mImpl;
+
 	std::recursive_mutex				mMutex;
 	std::unique_ptr<std::thread>		mThread;
 	std::atomic<bool>					mThreadShouldQuit;
 	std::atomic<double>					mThreadUpdateInterval = { 0.02 };
 	ci::signals::Connection				mUpdateConn;
+
+
 };
 
 //! Exception type thrown from errors within FileWatcher
