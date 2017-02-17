@@ -16,6 +16,10 @@ Config* Config::instance()
 	return &sInstance;
 }
 
+ConfigRef Config::create() {
+	return ConfigRef(new Config());
+}
+
 bool Config::read( const DataSourceRef &source )
 {
 	mSource = source;

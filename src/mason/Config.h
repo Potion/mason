@@ -73,6 +73,7 @@ public:
 
 	//! Returns the singleton instance of this app's Config
 	static Config* instance();
+	static ConfigRef create();
 
 	void setOptions( const Options &options ) { mOptions = options; }
 
