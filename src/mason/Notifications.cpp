@@ -71,7 +71,7 @@ void Dispatch::setTimeline( const ci::TimelineRef &timeline )
 // static
 ci::Timeline* Dispatch::getTimeline()
 {
-	CI_ASSERT( sTimeline );
+	//CI_ASSERT( sTimeline );
 
 	if( sTimeline )
 		return sTimeline.get();
